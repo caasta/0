@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" fill="none">
+  <defs>
+    <linearGradient id="p2" x1="0" y1="0" x2="480" y2="320">
+      <stop stop-color="#12182c"/><stop offset="1" stop-color="#221848"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="320" fill="url(#p2)"/>
+  <rect x="28" y="28" width="424" height="220" rx="16" fill="#0d1324" stroke="rgba(108,76,255,.35)"/>
+  <rect x="48" y="48" width="120" height="72" rx="10" fill="#2a3558"/>
+  <rect x="180" y="48" width="120" height="72" rx="10" fill="#3a2870"/>
+  <rect x="312" y="48" width="120" height="72" rx="10" fill="#1f4d6e"/>
+  <rect x="48" y="136" width="384" height="14" rx="7" fill="#2a3148"/>
+  <rect x="48" y="162" width="260" height="10" rx="5" fill="#222a40"/>
+  <rect x="48" y="190" width="180" height="36" rx="10" fill="#6c4cff" opacity=".85"/>
+  <text x="28" y="290" fill="rgba(255,255,255,.45)" font-family="system-ui,sans-serif" font-size="16">Product demo 2</text>
+</svg>
