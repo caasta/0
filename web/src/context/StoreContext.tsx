@@ -78,6 +78,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     try {
       const data = await fetchContent()
       setContentState(data)
+      // Remap cart lines if products were migrated off legacy p1–p4 IDs
+      setCart((prev) => {
+        const legacy: Record<string, string> = {
+          p1: '4',
+          p2: '3',
+          p3: '1',
+          p4: '2',
+        }
+        let changed = false
+        const next = prev.map((item) => {
+          const mapped = legacy[item.productId]
+          if (mapped && data.products.some((p) => p.id === mapped)) {
+            changed = true
+            return { ...item, productId: mapped }
+          }
+          return item
+        })
+        if (changed) saveCart(next)
+        return changed ? next : prev
+      })
     } catch (err) {
       setError(
         err instanceof Error

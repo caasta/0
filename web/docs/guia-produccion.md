@@ -186,10 +186,23 @@ npm run dev
 - Archivos críticos: `data/content.json`, `data/auth.json`
 - Reset de contenido (seed): Admin → Ajustes → **Reset a seed**
 
+### IDs de producto (`p1` → `4`, etc.)
+
+El catálogo en vivo usa IDs numéricos (`/store/product/4`). El seed actual ya trae `4`, `3`, `1`, `2`.
+
+Al arrancar, el servidor **migra automáticamente** IDs antiguos `p1`–`p4` a esos números y rellena campos de ficha (galería, features…) si faltan. `/store/product/p1` redirige a `/store/product/4`.
+
+Si tras subir el ZIP sigues viendo URLs `…/product/p1` o fichas incompletas:
+
+1. Entra a `/admin` → **Ajustes** → **Reset a seed**, **o**
+2. Borra `data/content.json` en el servidor y **Restart** la app Node (se regenera desde el seed).
+
+Conserva `data/auth.json` si no quieres resetear la contraseña de admin.
+
 ## Checklist rápido de go-live
 
 1. Cambiar contraseña de admin.
 2. Configurar número de WhatsApp real.
-3. Revisar productos y precios.
+3. Revisar productos y precios (URLs `/store/product/4`, etc.).
 4. Confirmar que `data/` persiste tras reiniciar el proceso.
 5. Activar HTTPS en el dominio.

@@ -11,16 +11,33 @@ import {
   productWhatsAppUrl,
 } from '../lib/whatsapp'
 
+/** Legacy seed IDs from early deploys → live numeric IDs */
+const LEGACY_PRODUCT_IDS: Record<string, string> = {
+  p1: '4',
+  p2: '3',
+  p3: '1',
+  p4: '2',
+}
+
 export default function ProductDetailPage() {
   const { id } = useParams()
   const { content, addToCart } = useStore()
-  const product = content.products.find((p) => String(p.id) === String(id))
+  const rawId = String(id || '')
+  const canonicalId = LEGACY_PRODUCT_IDS[rawId] || rawId
+
+  const product = content.products.find(
+    (p) => String(p.id) === canonicalId || String(p.id) === rawId,
+  )
   const gallery = useMemo(
     () => (product ? productGallery(product) : []),
     [product],
   )
   const [active, setActive] = useState(0)
   const [lightbox, setLightbox] = useState(false)
+
+  if (LEGACY_PRODUCT_IDS[rawId] && product) {
+    return <Navigate to={`/store/product/${LEGACY_PRODUCT_IDS[rawId]}`} replace />
+  }
 
   if (!product) {
     return <Navigate to="/store" replace />
@@ -35,15 +52,17 @@ export default function ProductDetailPage() {
         <SceneBackground />
         <section className="product-detail">
           <div className="store-container">
-            <div className="store-breadcrumb">
+            <nav className="store-breadcrumb" aria-label="Breadcrumb">
               <Link to="/">Inicio</Link>
-              <i className="ri-arrow-right-s-line" />
-              <Link to={`/store?category=${encodeURIComponent(product.category)}`}>
+              <i className="ri-arrow-right-s-line" aria-hidden="true" />
+              <Link
+                to={`/store?category=${encodeURIComponent(product.category)}`}
+              >
                 {product.category}
               </Link>
-              <i className="ri-arrow-right-s-line" />
+              <i className="ri-arrow-right-s-line" aria-hidden="true" />
               <span>{product.name}</span>
-            </div>
+            </nav>
 
             <div className="product-detail-grid">
               <div className="product-media-stack">
@@ -61,7 +80,7 @@ export default function ProductDetailPage() {
                     </span>
                   </button>
                   {gallery.length > 1 && (
-                    <div className="product-thumbnails">
+                    <div className="product-thumbnails" role="list">
                       {gallery.map((src, index) => (
                         <button
                           key={`${src}-${index}`}
@@ -69,6 +88,7 @@ export default function ProductDetailPage() {
                           className={index === active ? 'active' : ''}
                           onClick={() => setActive(index)}
                           aria-label={`Imagen ${index + 1}`}
+                          aria-current={index === active ? 'true' : undefined}
                         >
                           <img src={src} alt="" />
                         </button>
@@ -76,48 +96,74 @@ export default function ProductDetailPage() {
                     </div>
                   )}
                 </div>
+
+                {!!product.features?.length && (
+                  <section className="product-features">
+                    <h2>Características</h2>
+                    <ul>
+                      {product.features.map((f) => (
+                        <li key={f}>
+                          <span className="product-feature-check" aria-hidden="true">
+                            ✓
+                          </span>
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
               </div>
 
-              <div className="product-info">
+              <aside className="product-info">
                 <div className="product-type-row">
                   <span className="product-type">{product.typeLabel}</span>
                   {product.featured && (
-                    <span className="featured-label">Destacado</span>
+                    <span className="featured-label">
+                      <i className="ri-star-fill" aria-hidden="true" />
+                      Destacado
+                    </span>
                   )}
                 </div>
+
                 <h1>{product.name}</h1>
-                <p className="product-sku">SKU: {product.sku}</p>
+                {product.sku && (
+                  <p className="product-sku">SKU: {product.sku}</p>
+                )}
+
                 <div className="product-detail-price">
                   <strong>{formatPrice(product.price)}</strong>
                 </div>
+
                 <div
                   className={`stock-line ${product.inStock === false ? 'unavailable' : 'available'}`}
                 >
                   <i
                     className={
                       product.inStock === false
-                        ? 'ri-close-circle-line'
-                        : 'ri-checkbox-circle-line'
+                        ? 'ri-close-circle-fill'
+                        : 'ri-checkbox-circle-fill'
                     }
+                    aria-hidden="true"
                   />
                   {product.inStock === false ? 'No disponible' : 'Disponible'}
                 </div>
+
                 <p className="product-description">{productLongText(product)}</p>
 
                 <div className="product-delivery">
-                  <i className="ri-time-line" />
+                  <i className="ri-time-line" aria-hidden="true" />
                   <span>
                     Tiempo de entrega
                     <small>{product.deliveryTime || '24 ~ 72 hr'}</small>
                   </span>
                 </div>
 
-                {(product.includes?.length || product.compatibility?.length) && (
+                {(product.includes?.length || product.compatibility?.length) ? (
                   <div className="product-extra-grid">
                     {!!product.includes?.length && (
                       <section>
                         <h3>
-                          <i className="ri-box-3-line" />
+                          <i className="ri-checkbox-circle-line" aria-hidden="true" />
                           Incluye
                         </h3>
                         <ul>
@@ -130,7 +176,7 @@ export default function ProductDetailPage() {
                     {!!product.compatibility?.length && (
                       <section>
                         <h3>
-                          <i className="ri-cpu-line" />
+                          <i className="ri-computer-line" aria-hidden="true" />
                           Compatibilidad
                         </h3>
                         <ul>
@@ -141,63 +187,47 @@ export default function ProductDetailPage() {
                       </section>
                     )}
                   </div>
-                )}
+                ) : null}
 
                 <div className="product-buy-actions">
                   <button
                     type="button"
-                    className="store-btn primary wa-btn"
+                    className="store-btn primary wa-btn product-buy-primary"
                     onClick={() =>
                       openWhatsApp(productWhatsAppUrl(content, product))
                     }
                   >
-                    <i className="ri-whatsapp-fill" />
+                    <i className="ri-whatsapp-fill" aria-hidden="true" />
                     Comprar por WhatsApp
                   </button>
                   <button
                     type="button"
-                    className="store-btn secondary"
+                    className="store-btn secondary product-buy-secondary"
                     onClick={() => addToCart(product.id)}
                   >
-                    <i className="ri-add-line" />
+                    <i className="ri-shopping-cart-2-line" aria-hidden="true" />
                     Agregar a la lista
                   </button>
                 </div>
 
                 <div className="product-benefits">
                   <div>
-                    <i className="ri-shield-check-line" />
+                    <i className="ri-shield-check-line" aria-hidden="true" />
                     <span>
                       Compra segura
-                      <small>Consulta y pago coordinados por WhatsApp</small>
+                      <small>Transacciones protegidas</small>
                     </span>
                   </div>
                   <div>
-                    <i className="ri-customer-service-2-line" />
+                    <i className="ri-customer-service-2-line" aria-hidden="true" />
                     <span>
                       Soporte
                       <small>Estamos para ayudarte</small>
                     </span>
                   </div>
                 </div>
-              </div>
+              </aside>
             </div>
-
-            {!!product.features?.length && (
-              <div className="product-detail-after">
-                <section className="product-features">
-                  <h3>Características</h3>
-                  <ul>
-                    {product.features.map((f) => (
-                      <li key={f}>
-                        <span aria-hidden="true">✓</span>
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              </div>
-            )}
           </div>
         </section>
       </main>
