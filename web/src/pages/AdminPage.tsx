@@ -3,7 +3,6 @@ import { Link, Navigate } from 'react-router-dom'
 import { useStore } from '../context/StoreContext'
 import type { Product, SiteContent } from '../types'
 import { formatPrice } from '../lib/whatsapp'
-import { loadContent } from '../lib/storage'
 
 type Tab =
   | 'hero'
@@ -44,12 +43,14 @@ function Field({
 export default function AdminPage() {
   const {
     adminAuthed,
+    authChecked,
     content,
     setContent,
     resetContent,
     exportJson,
     importJson,
     logoutAdmin,
+    changeAdminPassword,
   } = useStore()
   const [tab, setTab] = useState<Tab>('products')
   const [draft, setDraft] = useState<SiteContent>(content)
@@ -59,6 +60,7 @@ export default function AdminPage() {
   const [pwdNext, setPwdNext] = useState('')
   const [importText, setImportText] = useState('')
   const [notice, setNotice] = useState('')
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     setDraft(content)
@@ -69,14 +71,32 @@ export default function AdminPage() {
     [draft.products, editingId],
   )
 
-  if (!adminAuthed) return <Navigate to="/admin/login" replace />
+  if (authChecked && !adminAuthed) {
+    return <Navigate to="/admin/login" replace />
+  }
+  if (!authChecked) {
+    return (
+      <div className="admin-login-page">
+        <p>Verificando sesión…</p>
+      </div>
+    )
+  }
 
   const syncDraft = (next: SiteContent) => setDraft(next)
 
-  const save = () => {
-    setContent(draft)
-    setSavedAt(new Date().toLocaleTimeString())
-    setNotice('Cambios guardados en este navegador (localStorage).')
+  const save = async () => {
+    setSaving(true)
+    try {
+      await setContent(draft)
+      setSavedAt(new Date().toLocaleTimeString())
+      setNotice('Cambios guardados en el servidor. Todos los visitantes verán esta versión.')
+    } catch (err) {
+      setNotice(
+        err instanceof Error ? err.message : 'No se pudo guardar en el servidor',
+      )
+    } finally {
+      setSaving(false)
+    }
   }
 
   const upsertProduct = (product: Product) => {
@@ -136,7 +156,7 @@ export default function AdminPage() {
         </nav>
         <div className="admin-sidebar-foot">
           <Link to="/">Ver tienda</Link>
-          <button type="button" onClick={logoutAdmin}>
+          <button type="button" onClick={() => void logoutAdmin()}>
             Cerrar sesión
           </button>
         </div>
@@ -146,13 +166,18 @@ export default function AdminPage() {
         <header className="admin-topbar">
           <div>
             <h1>{TABS.find((t) => t.id === tab)?.label}</h1>
-            <p>Edita el contenido de la landing y guarda localmente.</p>
+            <p>Edita el contenido y guárdalo en el servidor para todos los visitantes.</p>
           </div>
           <div className="admin-topbar-actions">
             {savedAt && <small>Guardado {savedAt}</small>}
-            <button type="button" className="store-btn primary" onClick={save}>
+            <button
+              type="button"
+              className="store-btn primary"
+              onClick={() => void save()}
+              disabled={saving}
+            >
               <i className="ri-save-line" />
-              Guardar
+              {saving ? 'Guardando…' : 'Guardar'}
             </button>
           </div>
         </header>
@@ -809,23 +834,24 @@ export default function AdminPage() {
                   type="button"
                   className="store-btn primary"
                   onClick={() => {
-                    if (pwdCurrent !== draft.admin.password) {
-                      setNotice('La contraseña actual no coincide.')
-                      return
-                    }
-                    if (pwdNext.trim().length < 4) {
-                      setNotice('La nueva contraseña debe tener al menos 4 caracteres.')
-                      return
-                    }
-                    const next = {
-                      ...draft,
-                      admin: { password: pwdNext.trim() },
-                    }
-                    setDraft(next)
-                    setContent(next)
-                    setPwdCurrent('')
-                    setPwdNext('')
-                    setNotice('Contraseña actualizada y guardada.')
+                    void (async () => {
+                      const result = await changeAdminPassword(
+                        pwdCurrent,
+                        pwdNext,
+                      )
+                      if (!result.ok) {
+                        setNotice(
+                          result.error ||
+                            'No se pudo cambiar. Verifica la contraseña actual (mín. 4 caracteres).',
+                        )
+                        return
+                      }
+                      setPwdCurrent('')
+                      setPwdNext('')
+                      setNotice(
+                        'Contraseña actualizada en el servidor. Vuelve a iniciar sesión.',
+                      )
+                    })()
                   }}
                 >
                   Actualizar contraseña
@@ -835,8 +861,8 @@ export default function AdminPage() {
               <div className="admin-card-block">
                 <h3>Exportar / importar / reset</h3>
                 <p>
-                  Los datos viven en <code>localStorage</code>. Exporta un JSON
-                  para respaldo o restaura el seed inicial.
+                  Los datos viven en el servidor (<code>data/content.json</code>
+                  ). Exporta un JSON para respaldo o restaura el seed inicial.
                 </p>
                 <div className="admin-row-actions">
                   <button
@@ -866,9 +892,18 @@ export default function AdminPage() {
                         )
                       )
                         return
-                      resetContent()
-                      setDraft(loadContent())
-                      setNotice('Contenido restablecido al seed de demo.')
+                      void (async () => {
+                        try {
+                          await resetContent()
+                          setNotice('Contenido restablecido en el servidor.')
+                        } catch (err) {
+                          setNotice(
+                            err instanceof Error
+                              ? err.message
+                              : 'No se pudo restablecer',
+                          )
+                        }
+                      })()
                     }}
                   >
                     Reset a seed
@@ -886,18 +921,19 @@ export default function AdminPage() {
                   type="button"
                   className="store-btn primary"
                   onClick={() => {
-                    try {
-                      importJson(importText)
-                      setDraft(loadContent())
-                      setImportText('')
-                      setNotice('Importación aplicada.')
-                    } catch (err) {
-                      setNotice(
-                        err instanceof Error
-                          ? err.message
-                          : 'No se pudo importar el JSON',
-                      )
-                    }
+                    void (async () => {
+                      try {
+                        await importJson(importText)
+                        setImportText('')
+                        setNotice('Importación aplicada en el servidor.')
+                      } catch (err) {
+                        setNotice(
+                          err instanceof Error
+                            ? err.message
+                            : 'No se pudo importar el JSON',
+                        )
+                      }
+                    })()
                   }}
                 >
                   Importar JSON

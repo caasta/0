@@ -9,8 +9,10 @@ import ContactSupport from '../components/ContactSupport'
 import FinalCta from '../components/FinalCta'
 import Footer from '../components/Footer'
 import Catalog from '../components/Catalog'
+import { useStore } from '../context/StoreContext'
 
 export default function HomePage() {
+  const { loading, error, refreshContent } = useStore()
   const [progress, setProgress] = useState(0)
   const [glow, setGlow] = useState({ x: 0, y: 0, visible: false })
 
@@ -50,6 +52,21 @@ export default function HomePage() {
       <Header />
       <main>
         <SceneBackground />
+        {error && (
+          <div className="store-container" style={{ paddingTop: 28 }}>
+            <div className="support-form-alert error" role="alert">
+              {error}{' '}
+              <button type="button" onClick={() => void refreshContent()}>
+                Reintentar
+              </button>
+            </div>
+          </div>
+        )}
+        {loading && !error && (
+          <div className="store-container" style={{ padding: '40px 0' }}>
+            <p style={{ color: 'var(--muted)' }}>Cargando catálogo…</p>
+          </div>
+        )}
         <Hero />
         <Stats />
         <FeaturedProducts />

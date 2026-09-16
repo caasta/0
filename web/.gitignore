@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Runtime data (content/auth persisted on server)
+data/content.json
+data/auth.json
+data/sessions.json
+deploy/*.zip
+.env

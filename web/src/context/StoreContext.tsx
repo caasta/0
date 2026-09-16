@@ -9,27 +9,34 @@ import {
 } from 'react'
 import type { CartItem, Product, SiteContent } from '../types'
 import {
-  isAdminAuthenticated,
-  loadCart,
-  loadContent,
-  loadTheme,
-  resetContent as resetStoredContent,
-  saveCart,
-  saveContent,
-  saveTheme,
-  setAdminAuthenticated,
-  importContentJson,
+  emptyContent,
   exportContentJson,
+  getAdminToken,
+  loadCart,
+  loadTheme,
+  saveCart,
+  saveTheme,
 } from '../lib/storage'
-import { DEFAULT_ADMIN_PASSWORD } from '../data/seed'
+import {
+  changePasswordApi,
+  fetchContent,
+  importContentApi,
+  loginApi,
+  logoutApi,
+  meApi,
+  resetContentApi,
+  saveContentApi,
+} from '../lib/api'
 
 type StoreContextValue = {
   content: SiteContent
-  setContent: (next: SiteContent) => void
-  updateContent: (patch: Partial<SiteContent>) => void
-  resetContent: () => void
+  loading: boolean
+  error: string | null
+  refreshContent: () => Promise<void>
+  setContent: (next: SiteContent) => Promise<void>
+  resetContent: () => Promise<void>
   exportJson: () => string
-  importJson: (raw: string) => void
+  importJson: (raw: string) => Promise<void>
   cart: CartItem[]
   cartCount: number
   addToCart: (productId: string) => void
@@ -40,47 +47,92 @@ type StoreContextValue = {
   theme: 'dark' | 'light'
   toggleTheme: () => void
   adminAuthed: boolean
-  loginAdmin: (password: string) => boolean
-  logoutAdmin: () => void
-  changeAdminPassword: (current: string, next: string) => boolean
+  authChecked: boolean
+  loginAdmin: (password: string) => Promise<boolean>
+  logoutAdmin: () => Promise<void>
+  changeAdminPassword: (
+    current: string,
+    next: string,
+  ) => Promise<{ ok: boolean; error?: string }>
 }
 
 const StoreContext = createContext<StoreContextValue | null>(null)
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [content, setContentState] = useState<SiteContent>(() => loadContent())
+  const [content, setContentState] = useState<SiteContent>(() => emptyContent())
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [cart, setCart] = useState<CartItem[]>(() => loadCart())
   const [theme, setTheme] = useState<'dark' | 'light'>(() => loadTheme())
-  const [adminAuthed, setAdminAuthed] = useState(() => isAdminAuthenticated())
+  const [adminAuthed, setAdminAuthed] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     saveTheme(theme)
   }, [theme])
 
-  const setContent = useCallback((next: SiteContent) => {
-    setContentState(next)
-    saveContent(next)
+  const refreshContent = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await fetchContent()
+      setContentState(data)
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'No se pudo cargar el contenido del servidor',
+      )
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  const updateContent = useCallback((patch: Partial<SiteContent>) => {
-    setContentState((prev) => {
-      const next = { ...prev, ...patch }
-      saveContent(next)
-      return next
-    })
+  useEffect(() => {
+    void refreshContent()
+  }, [refreshContent])
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      if (!getAdminToken()) {
+        if (!cancelled) {
+          setAdminAuthed(false)
+          setAuthChecked(true)
+        }
+        return
+      }
+      const ok = await meApi()
+      if (!cancelled) {
+        setAdminAuthed(ok)
+        setAuthChecked(true)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  const resetContent = useCallback(() => {
-    const next = resetStoredContent()
+  const setContent = useCallback(async (next: SiteContent) => {
+    const saved = await saveContentApi(next)
+    setContentState(saved)
+  }, [])
+
+  const resetContent = useCallback(async () => {
+    const next = await resetContentApi()
     setContentState(next)
   }, [])
 
   const exportJson = useCallback(() => exportContentJson(content), [content])
 
-  const importJson = useCallback((raw: string) => {
-    const next = importContentJson(raw)
-    setContentState(next)
+  const importJson = useCallback(async (raw: string) => {
+    const parsed = JSON.parse(raw) as SiteContent
+    if (!parsed || !Array.isArray(parsed.products)) {
+      throw new Error('JSON inválido: falta products[]')
+    }
+    const saved = await importContentApi(parsed)
+    setContentState(saved)
   }, [])
 
   const addToCart = useCallback((productId: string) => {
@@ -139,40 +191,45 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [cart],
   )
 
-  const loginAdmin = useCallback(
-    (password: string) => {
-      const expected = content.admin.password || DEFAULT_ADMIN_PASSWORD
-      if (password !== expected) return false
-      setAdminAuthenticated(true)
+  const loginAdmin = useCallback(async (password: string) => {
+    try {
+      await loginApi(password)
       setAdminAuthed(true)
       return true
-    },
-    [content.admin.password],
-  )
+    } catch {
+      setAdminAuthed(false)
+      return false
+    }
+  }, [])
 
-  const logoutAdmin = useCallback(() => {
-    setAdminAuthenticated(false)
+  const logoutAdmin = useCallback(async () => {
+    await logoutApi()
     setAdminAuthed(false)
   }, [])
 
   const changeAdminPassword = useCallback(
-    (current: string, next: string) => {
-      if (current !== content.admin.password) return false
-      if (next.trim().length < 4) return false
-      const updated = {
-        ...content,
-        admin: { password: next.trim() },
+    async (current: string, next: string) => {
+      try {
+        await changePasswordApi(current, next)
+        setAdminAuthed(false)
+        return { ok: true }
+      } catch (err) {
+        return {
+          ok: false,
+          error:
+            err instanceof Error ? err.message : 'No se pudo cambiar la contraseña',
+        }
       }
-      setContent(updated)
-      return true
     },
-    [content, setContent],
+    [],
   )
 
   const value: StoreContextValue = {
     content,
+    loading,
+    error,
+    refreshContent,
     setContent,
-    updateContent,
     resetContent,
     exportJson,
     importJson,
@@ -186,6 +243,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     theme,
     toggleTheme: () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')),
     adminAuthed,
+    authChecked,
     loginAdmin,
     logoutAdmin,
     changeAdminPassword,

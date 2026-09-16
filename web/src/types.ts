@@ -79,9 +79,6 @@ export type SiteContent = {
     cartMessageTemplate: string
     generalMessageTemplate: string
   }
-  admin: {
-    password: string
-  }
 }
 
 export type CartItem = {

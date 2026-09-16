@@ -1,14 +1,13 @@
-# AppRebrands landing + admin demo
+# AppRebrands — tienda + admin (producción)
 
-Faithful visual recreation of [apprebrands.com](https://apprebrands.com/) with a local CMS and WhatsApp purchase flow.
+Landing lookalike de apprebrands.com con CMS y compras por WhatsApp.
 
-## Stack
+## Requisitos
 
-- Vite + React + TypeScript + React Router
-- Remix Icon + Inter
-- Persistence: `localStorage` + in-repo seed (`src/data/seed.ts`)
+- Node.js 20+ (recomendado)
+- Espacio en disco para `data/` (JSON persistente)
 
-## Run
+## Desarrollo
 
 ```bash
 cd web
@@ -16,49 +15,52 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`.
+- Frontend: http://localhost:5173 (proxy `/api` → :3000)
+- API: http://localhost:3000
 
-## Admin
-
-- URL: `http://localhost:5173/admin` (redirects to `/admin/login` if needed)
-- Default user: `admin`
-- Default password: `admin123` (changeable in Admin → Ajustes)
-
-### What you can edit
-
-- Hero / brand / featured copy
-- Stats
-- Products CRUD (name, price, description, category, featured, image URL)
-- How-it-works, contact, footer
-- WhatsApp number + message templates
-- Export / import JSON, reset to seed, change password
-
-## WhatsApp
-
-Configure under **Admin → WhatsApp**:
-
-- Phone: digits with country code, no `+` (placeholder seed: `15551234567`)
-- Product template vars: `{name}` `{price}` `{category}` `{description}`
-- Cart template vars: `{items}` `{total}`
-
-Public CTAs open `https://wa.me/<phone>?text=...` — product buy buttons, header WhatsApp, contact form, and cart **Continuar por WhatsApp**.
-
-## Cart
-
-`/cart` is a shortlist, not a card checkout. Users add products, then continue on WhatsApp.
-
-## Reset / export data
-
-- **Export JSON** / **Import JSON** / **Reset a seed** in Admin → Ajustes
-- Or clear browser keys:
-  - `apprebrands.demo.content.v1`
-  - `apprebrands.demo.cart.v1`
-  - `apprebrands.demo.adminAuth.v1`
-
-## Build
+## Producción local
 
 ```bash
 cd web
+npm install
 npm run build
-npm run preview
+npm start
 ```
+
+Abre http://localhost:3000
+
+## Empaquetar ZIP
+
+```bash
+cd web
+npm run pack
+```
+
+Genera `deploy/apprebrands-deploy-YYYYMMDD.zip` con `dist/`, `server/`, `package.json`, `data/.gitkeep`, `.env.example`.
+
+En el servidor:
+
+```bash
+unzip apprebrands-deploy-*.zip -d apprebrands
+cd apprebrands
+npm install --omit=dev
+cp .env.example .env   # edita ADMIN_PASSWORD y PORT
+npm start
+```
+
+## Admin
+
+- URL: `/admin`
+- Usuario: `admin`
+- Contraseña por defecto: `admin123` (o `ADMIN_PASSWORD` en el primer arranque)
+- WhatsApp: Admin → WhatsApp
+
+## Persistencia
+
+- Contenido: `data/content.json`
+- Auth (hash bcrypt): `data/auth.json`
+- Sesiones admin: memoria del proceso Node (se pierden al reiniciar el servidor; hay que volver a entrar)
+
+## Limitación
+
+Necesita **Node.js** en el hosting (no es sitio 100% estático). Opciones: VPS, Railway, Render, Fly.io, o cPanel con “Node.js App” / Passenger.
