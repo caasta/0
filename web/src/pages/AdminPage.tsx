@@ -121,14 +121,22 @@ export default function AdminPage() {
   }
 
   const blankProduct = (): Product => ({
-    id: `p${Date.now()}`,
+    id: String(Date.now()),
     name: 'Nuevo producto',
     price: 0,
     description: '',
+    longDescription: '',
     category: draft.categories[0] || 'General',
     typeLabel: 'Producto digital',
     featured: false,
     image: '/placeholders/product-1.svg',
+    gallery: ['/placeholders/product-1.svg'],
+    sku: '',
+    deliveryTime: '24 ~ 72 hr',
+    features: [],
+    includes: [],
+    compatibility: [],
+    inStock: true,
   })
 
   return (
@@ -474,9 +482,9 @@ export default function AdminPage() {
                         />
                       </Field>
                     </div>
-                    <Field label="Descripción">
+                    <Field label="Descripción corta (catálogo)">
                       <textarea
-                        rows={4}
+                        rows={3}
                         value={editingProduct.description}
                         onChange={(e) =>
                           upsertProduct({
@@ -486,6 +494,111 @@ export default function AdminPage() {
                         }
                       />
                     </Field>
+                    <Field label="Descripción larga (ficha)">
+                      <textarea
+                        rows={5}
+                        value={editingProduct.longDescription || ''}
+                        onChange={(e) =>
+                          upsertProduct({
+                            ...editingProduct,
+                            longDescription: e.target.value,
+                          })
+                        }
+                      />
+                    </Field>
+                    <div className="admin-grid-2">
+                      <Field label="SKU">
+                        <input
+                          value={editingProduct.sku || ''}
+                          onChange={(e) =>
+                            upsertProduct({
+                              ...editingProduct,
+                              sku: e.target.value,
+                            })
+                          }
+                        />
+                      </Field>
+                      <Field label="Tiempo de entrega">
+                        <input
+                          value={editingProduct.deliveryTime || ''}
+                          onChange={(e) =>
+                            upsertProduct({
+                              ...editingProduct,
+                              deliveryTime: e.target.value,
+                            })
+                          }
+                          placeholder="24 ~ 72 hr"
+                        />
+                      </Field>
+                    </div>
+                    <Field label="Galería (URLs, una por línea)">
+                      <textarea
+                        rows={4}
+                        value={(editingProduct.gallery || [editingProduct.image])
+                          .join('\n')}
+                        onChange={(e) =>
+                          upsertProduct({
+                            ...editingProduct,
+                            gallery: e.target.value
+                              .split('\n')
+                              .map((s) => s.trim())
+                              .filter(Boolean),
+                            image:
+                              e.target.value
+                                .split('\n')
+                                .map((s) => s.trim())
+                                .filter(Boolean)[0] || editingProduct.image,
+                          })
+                        }
+                      />
+                    </Field>
+                    <Field label="Características (una por línea)">
+                      <textarea
+                        rows={4}
+                        value={(editingProduct.features || []).join('\n')}
+                        onChange={(e) =>
+                          upsertProduct({
+                            ...editingProduct,
+                            features: e.target.value
+                              .split('\n')
+                              .map((s) => s.trim())
+                              .filter(Boolean),
+                          })
+                        }
+                      />
+                    </Field>
+                    <div className="admin-grid-2">
+                      <Field label="Incluye (una por línea)">
+                        <textarea
+                          rows={4}
+                          value={(editingProduct.includes || []).join('\n')}
+                          onChange={(e) =>
+                            upsertProduct({
+                              ...editingProduct,
+                              includes: e.target.value
+                                .split('\n')
+                                .map((s) => s.trim())
+                                .filter(Boolean),
+                            })
+                          }
+                        />
+                      </Field>
+                      <Field label="Compatibilidad (una por línea)">
+                        <textarea
+                          rows={4}
+                          value={(editingProduct.compatibility || []).join('\n')}
+                          onChange={(e) =>
+                            upsertProduct({
+                              ...editingProduct,
+                              compatibility: e.target.value
+                                .split('\n')
+                                .map((s) => s.trim())
+                                .filter(Boolean),
+                            })
+                          }
+                        />
+                      </Field>
+                    </div>
                     <label className="admin-check">
                       <input
                         type="checkbox"
@@ -499,6 +612,19 @@ export default function AdminPage() {
                       />
                       Destacado en homepage
                     </label>
+                    <label className="admin-check">
+                      <input
+                        type="checkbox"
+                        checked={editingProduct.inStock !== false}
+                        onChange={(e) =>
+                          upsertProduct({
+                            ...editingProduct,
+                            inStock: e.target.checked,
+                          })
+                        }
+                      />
+                      Disponible / en stock
+                    </label>
                     <div className="admin-row-actions">
                       <button
                         type="button"
@@ -507,6 +633,13 @@ export default function AdminPage() {
                       >
                         Eliminar
                       </button>
+                      <Link
+                        className="store-btn secondary"
+                        to={`/store/product/${editingProduct.id}`}
+                        target="_blank"
+                      >
+                        Ver ficha
+                      </Link>
                     </div>
                     <Field label="Categorías del menú (separadas por coma)">
                       <input

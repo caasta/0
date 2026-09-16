@@ -23,7 +23,7 @@ export default function Hero() {
           <h1>{hero.title}</h1>
           <p>{hero.subtitle}</p>
           <div className="commerce-hero-actions">
-            <a className="store-btn primary" href="#featured">
+            <a className="store-btn primary" href="/store">
               {hero.primaryCta}
               <i className="ri-arrow-right-line" />
             </a>

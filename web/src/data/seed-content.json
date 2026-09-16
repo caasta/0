@@ -91,7 +91,7 @@
       },
       {
         "label": "Tienda",
-        "href": "/#featured"
+        "href": "/store"
       }
     ],
     "supportLinks": [
@@ -147,44 +147,160 @@
   ],
   "products": [
     {
-      "id": "p1",
+      "id": "4",
       "name": "Nova IPTV Player | Aplicación Flutter con panel de administración PHP",
       "price": 79.99,
-      "description": "Reproductor IPTV multiplataforma con panel de administración PHP incluido.",
+      "description": "Nova IPTV Player es un reproductor multimedia premium basado en Flutter para dispositivos móviles Android, Android TV, iPhone y iPad.",
+      "longDescription": "Nova IPTV Player es un reproductor multimedia premium basado en Flutter para dispositivos móviles Android, Android TV, iPhone y iPad. Ofrece una reproducción de alto rendimiento con un panel de administración PHP profesional para la gestión de usuarios, dispositivos y listas de reproducción. Diseñado para desarrolladores y empresas que buscan una solución moderna, escalable y fácil de personalizar.",
       "category": "Android",
       "typeLabel": "Producto digital",
       "featured": true,
-      "image": "/placeholders/product-1.svg"
+      "image": "/placeholders/product-1.svg",
+      "gallery": [
+        "/placeholders/product-1.svg",
+        "/placeholders/product-2.svg",
+        "/placeholders/product-3.svg",
+        "/placeholders/product-4.svg"
+      ],
+      "sku": "NOVA-IPTV-PLAYER-FLUTTER-PHP",
+      "deliveryTime": "24 ~ 72 hr",
+      "inStock": true,
+      "features": [
+        "Nova IPTV Player es compatible con el formato API Xtream Codes, ampliamente utilizado para garantizar la interoperabilidad.",
+        "El término (Xtream Codes) se utiliza únicamente para describir la compatibilidad con este formato API.",
+        "Nova IPTV Player no está afiliado, respaldado, patrocinado ni asociado con el proyecto Xtream Codes, sus propietarios ni ninguna organización relacionada."
+      ],
+      "includes": [
+        "Código fuente de Flutter",
+        "Panel de administración PHP",
+        "Base de datos MySQL",
+        "Documentación completa",
+        "Guía de instalación"
+      ],
+      "compatibility": [
+        "Flutter SDK 3.41+",
+        "Dart SDK 3.9+",
+        "PHP 8.1+",
+        "MySQL 5.7+ / MariaDB 10+",
+        "Android 7.0+",
+        "iOS 15.5+"
+      ]
     },
     {
-      "id": "p2",
+      "id": "3",
       "name": "XOE PLUS Roku",
       "price": 425,
-      "description": "Aplicación Roku personalizada con branding completo.",
+      "description": "Aplicación Roku personalizada para empresas de IPTV. Incluye identidad visual, pantalla de inicio y configuración base.",
+      "longDescription": "Aplicación Roku personalizada para empresas de IPTV. Incluye identidad visual, pantalla de inicio, configuración básica y preparación para su publicación o distribución según el paquete contratado.",
       "category": "Roku",
       "typeLabel": "Personalizado",
       "featured": true,
-      "image": "/placeholders/product-2.svg"
+      "image": "/placeholders/product-2.svg",
+      "gallery": [
+        "/placeholders/product-2.svg",
+        "/placeholders/product-1.svg",
+        "/placeholders/product-3.svg"
+      ],
+      "sku": "XOE-PLUS-ROKU",
+      "deliveryTime": "24 ~ 72 hr",
+      "inStock": true,
+      "features": [
+        "Panel admin completo: gestionas códigos, cambias credenciales en remoto.",
+        "Login con código RQ que llega automáticamente al panel admin: cero teclados para el cliente.",
+        "Activación y gestión de dispositivos.",
+        "Reconexión automática al servidor.",
+        "Canales en directo con guía de programación (EPG) organizada por categorías.",
+        "Favoritos de canales y modo de pantalla completa.",
+        "Películas por categorías, con buscador.",
+        "Series por categorías, con temporadas y episodios.",
+        "Buscador global de contenido.",
+        "Cierre de sesión (borra los datos locales y elimina el dispositivo).",
+        "Control parental protegido con PIN.",
+        "Gestión de servidores y DNS.",
+        "Administración de códigos, dispositivos y ajustes generales."
+      ],
+      "includes": [
+        "Logotipo personalizado",
+        "Nombre de la aplicación",
+        "Colores de la marca",
+        "Pantalla de inicio",
+        "Configuración de IPTV",
+        "Archivo PKG",
+        "Archivos PHP",
+        "Soporte básico"
+      ],
+      "compatibility": [
+        "Roku Express",
+        "Roku TV",
+        "Roku Stick",
+        "Roku Ultra",
+        "Roku Otros"
+      ]
     },
     {
-      "id": "p3",
+      "id": "1",
       "name": "XCTV Trailer API Pro",
       "price": 149,
-      "description": "API profesional para trailers y metadata de contenido.",
+      "description": "Plataforma autoadministrada para integrar y reproducir tráilers y metadata de contenido en tu stack IPTV.",
+      "longDescription": "YouTube API Server Pro / XCTV Trailer API Pro es una plataforma autoadministrada para Ubuntu Server que permite integrar y reproducir tráilers y metadata de contenido en tu infraestructura IPTV de forma controlada.",
       "category": "Scripts",
       "typeLabel": "Personalizado",
       "featured": true,
-      "image": "/placeholders/product-3.svg"
+      "image": "/placeholders/product-3.svg",
+      "gallery": [
+        "/placeholders/product-3.svg",
+        "/placeholders/product-4.svg"
+      ],
+      "sku": "XCTV-TRAILER-API-PRO",
+      "deliveryTime": "24 ~ 48 hr",
+      "inStock": true,
+      "features": [
+        "API orientada a tráilers y metadata.",
+        "Pensada para integración con paneles y apps IPTV.",
+        "Incluye documentación de endpoints básicos."
+      ],
+      "includes": [
+        "Código / scripts del servidor",
+        "Documentación de API",
+        "Guía de instalación en Ubuntu"
+      ],
+      "compatibility": [
+        "Ubuntu Server",
+        "PHP / stack típico de panel",
+        "Apps IPTV con consumo de API"
+      ]
     },
     {
-      "id": "p4",
+      "id": "2",
       "name": "Servidor de Correo Profesional",
       "price": 45,
-      "description": "Servidor de correo listo para producción con soporte incluido.",
+      "description": "Convierte tu VPS o servidor en un servidor de correo profesional para enviar y recibir mensajes.",
+      "longDescription": "Convierte tu VPS o SERVIDOR en un servidor de correo profesional completamente configurado para enviar y recibir mensajes con una base sólida de autenticación y buenas prácticas de entrega.",
       "category": "Paquetes",
       "typeLabel": "Producto digital",
       "featured": true,
-      "image": "/placeholders/product-4.svg"
+      "image": "/placeholders/product-4.svg",
+      "gallery": [
+        "/placeholders/product-4.svg",
+        "/placeholders/product-1.svg"
+      ],
+      "sku": "SERVIDOR-DE-CORREO-PROFESIONAL",
+      "deliveryTime": "24 ~ 48 hr",
+      "inStock": true,
+      "features": [
+        "Configuración orientada a envío y recepción profesional.",
+        "Documentación de DNS (MX/SPF/DKIM) a alto nivel.",
+        "Soporte inicial para puesta en marcha."
+      ],
+      "includes": [
+        "Guía de instalación",
+        "Checklist DNS",
+        "Soporte de configuración inicial"
+      ],
+      "compatibility": [
+        "VPS Linux",
+        "Dominio con acceso DNS"
+      ]
     }
   ],
   "categories": [

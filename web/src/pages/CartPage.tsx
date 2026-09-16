@@ -49,7 +49,7 @@ export default function CartPage() {
                 tarjeta en esta demo.
               </p>
             </div>
-            <Link to="/#featured">Seguir explorando</Link>
+            <Link to="/store">Seguir explorando</Link>
           </header>
 
           {!cartProducts.length ? (
@@ -57,7 +57,7 @@ export default function CartPage() {
               <i className="ri-shopping-cart-2-line" />
               <h3>Tu lista está vacía</h3>
               <p>Agrega productos desde el catálogo para consultar por WhatsApp.</p>
-              <Link className="store-btn primary" to="/#featured">
+              <Link className="store-btn primary" to="/store">
                 Ver productos
               </Link>
             </div>

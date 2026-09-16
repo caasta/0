@@ -16,9 +16,51 @@ function readSeed() {
   return JSON.parse(fs.readFileSync(seedPath, 'utf8'))
 }
 
+function normalizeProduct(product) {
+  const image = product.image || '/placeholders/product-1.svg'
+  const gallery =
+    Array.isArray(product.gallery) && product.gallery.length
+      ? product.gallery
+      : [image]
+  return {
+    id: String(product.id),
+    name: product.name || 'Producto',
+    price: Number(product.price) || 0,
+    description: product.description || '',
+    longDescription: product.longDescription || product.description || '',
+    category: product.category || 'General',
+    typeLabel: product.typeLabel || 'Producto digital',
+    featured: Boolean(product.featured),
+    image,
+    gallery,
+    sku:
+      product.sku ||
+      String(product.name || 'SKU')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 48),
+    deliveryTime: product.deliveryTime || '24 ~ 72 hr',
+    features: Array.isArray(product.features) ? product.features : [],
+    includes: Array.isArray(product.includes) ? product.includes : [],
+    compatibility: Array.isArray(product.compatibility)
+      ? product.compatibility
+      : [],
+    inStock: product.inStock !== false,
+  }
+}
+
+function normalizeContent(content) {
+  const next = { ...content }
+  next.products = Array.isArray(next.products)
+    ? next.products.map(normalizeProduct)
+    : []
+  return next
+}
+
 function deepMergeContent(seed, stored) {
   if (!stored || typeof stored !== 'object') return structuredClone(seed)
-  return {
+  return normalizeContent({
     ...structuredClone(seed),
     ...stored,
     hero: { ...seed.hero, ...stored.hero },
@@ -41,19 +83,18 @@ function deepMergeContent(seed, stored) {
     products: stored.products?.length ? stored.products : seed.products,
     categories: stored.categories?.length ? stored.categories : seed.categories,
     whatsapp: { ...seed.whatsapp, ...stored.whatsapp },
-  }
+  })
 }
 
 export function loadContent() {
   ensureDataDir()
-  const seed = readSeed()
+  const seed = normalizeContent(readSeed())
   if (!fs.existsSync(contentPath)) {
     fs.writeFileSync(contentPath, JSON.stringify(seed, null, 2))
     return structuredClone(seed)
   }
   try {
     const stored = JSON.parse(fs.readFileSync(contentPath, 'utf8'))
-    // Strip legacy admin password if present in old files
     if (stored && stored.admin) delete stored.admin
     return deepMergeContent(seed, stored)
   } catch {
@@ -63,7 +104,7 @@ export function loadContent() {
 
 export function saveContent(content) {
   ensureDataDir()
-  const clean = { ...content }
+  const clean = normalizeContent({ ...content })
   delete clean.admin
   if (!Array.isArray(clean.products)) {
     throw new Error('content.products must be an array')

@@ -4,11 +4,22 @@ export type Product = {
   id: string
   name: string
   price: number
+  /** Short text for cards / catalog */
   description: string
+  /** Full detail copy; falls back to description */
+  longDescription?: string
   category: string
   typeLabel: string
   featured: boolean
   image: string
+  /** Extra gallery images (detail page); falls back to [image] */
+  gallery?: string[]
+  sku?: string
+  deliveryTime?: string
+  features?: string[]
+  includes?: string[]
+  compatibility?: string[]
+  inStock?: boolean
 }
 
 export type StatItem = {
@@ -84,4 +95,13 @@ export type SiteContent = {
 export type CartItem = {
   productId: string
   quantity: number
+}
+
+export function productGallery(product: Product): string[] {
+  if (product.gallery?.length) return product.gallery
+  return product.image ? [product.image] : ['/placeholders/product-1.svg']
+}
+
+export function productLongText(product: Product): string {
+  return product.longDescription?.trim() || product.description
 }

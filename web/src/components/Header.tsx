@@ -27,15 +27,18 @@ export default function Header() {
               <i className="ri-arrow-down-s-line" />
             </summary>
             <div>
-              <a href="/#catalog">
+              <Link to="/store">
                 <i className="ri-layout-grid-fill" />
                 Todos los productos
-              </a>
+              </Link>
               {content.categories.map((cat) => (
-                <a key={cat} href={`/#catalog`}>
+                <Link
+                  key={cat}
+                  to={`/store?category=${encodeURIComponent(cat)}`}
+                >
                   <i className="ri-folder-3-line" />
                   {cat}
-                </a>
+                </Link>
               ))}
             </div>
           </details>

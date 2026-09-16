@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useStore } from '../context/StoreContext'
 import ProductCard from './ProductCard'
 
@@ -14,10 +15,10 @@ export default function FeaturedProducts() {
             <h2>{content.featured.title}</h2>
             <p>{content.featured.subtitle}</p>
           </div>
-          <a href="#catalog">
+          <Link to="/store">
             Ver todos
             <i className="ri-arrow-right-line" />
-          </a>
+          </Link>
         </header>
         <div className="product-grid">
           {products.map((product) => (

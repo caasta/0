@@ -12,7 +12,7 @@ export default function FinalCta() {
           <h2>{finalCta.title}</h2>
           <p>{finalCta.subtitle}</p>
         </div>
-        <a className="store-btn primary" href="#catalog">
+        <a className="store-btn primary" href="/store">
           {finalCta.button}
           <i className="ri-arrow-right-line" />
         </a>

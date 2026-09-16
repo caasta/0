@@ -59,7 +59,7 @@ export default function Footer() {
         <section className="store-footer-cta">
           <h3>{footer.ctaTitle}</h3>
           <p>{footer.ctaText}</p>
-          <a className="store-btn primary" href="#catalog">
+          <a className="store-btn primary" href="/store">
             {footer.ctaButton}
             <i className="ri-arrow-right-line" />
           </a>
