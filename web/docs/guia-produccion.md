@@ -7,9 +7,20 @@ Guía corta para publicar la tienda (landing + admin + WhatsApp) en un hosting c
 - Frontend React (carpeta `dist/`)
 - API Express que guarda el contenido en `data/content.json`
 - Login de admin en el servidor (contraseña con hash en `data/auth.json`)
+- Catálogo `/store` + fichas `/store/product/:id` (SPA fallback en Express)
 - Compras / consultas por WhatsApp (`wa.me`)
 
 **Importante:** no es un sitio solo HTML estático. Hace falta **Node.js** para que el admin y los cambios persistan para todos los visitantes.
+
+### Rutas públicas
+
+| Ruta | Contenido |
+|---|---|
+| `/` | Landing |
+| `/store` | Catálogo (búsqueda, categoría, tipo, orden) |
+| `/store/product/:id` | Ficha de producto (galería, specs, WhatsApp) |
+| `/cart` | Lista / pedido WhatsApp |
+| `/admin` | CMS (productos enriquecidos: galería, descripción larga, features, etc.) |
 
 ## Requisitos
 
