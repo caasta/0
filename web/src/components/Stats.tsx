@@ -1,12 +1,8 @@
-const STATS = [
-  { icon: 'ri-rocket-2-line', value: '250+', label: 'Aplicaciones entregadas' },
-  { icon: 'ri-group-line', value: '80+', label: 'Clientes activos' },
-  { icon: 'ri-checkbox-circle-line', value: '99.9%', label: 'Disponibilidad' },
-  { icon: 'ri-customer-service-2-line', value: '24/7', label: 'Soporte especializado' },
-  { icon: 'ri-palette-line', value: '100%', label: 'Personalización total' },
-]
+import { useStore } from '../context/StoreContext'
 
 export default function Stats() {
+  const { content } = useStore()
+
   return (
     <section
       className="commerce-section commerce-stats"
@@ -14,8 +10,12 @@ export default function Stats() {
     >
       <div className="store-container">
         <div className="commerce-stats-grid" role="list">
-          {STATS.map((stat, index) => (
-            <article key={stat.label} role="listitem" style={{ ['--stat-index' as string]: index }}>
+          {content.stats.map((stat, index) => (
+            <article
+              key={stat.id}
+              role="listitem"
+              style={{ ['--stat-index' as string]: index }}
+            >
               <i className={stat.icon} />
               <div>
                 <strong>{stat.value}</strong>

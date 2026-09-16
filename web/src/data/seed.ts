@@ -1,0 +1,192 @@
+import type { SiteContent } from '../types'
+
+export const DEFAULT_ADMIN_PASSWORD = 'admin123'
+
+export const seedContent: SiteContent = {
+  brandName: 'AppRebrands',
+  logoUrl: '/placeholders/logo.svg',
+  hero: {
+    kicker: 'Comercio Electrónico',
+    title: 'Encuentra productos creados para tu negocio.',
+    subtitle:
+      'Explora nuestro catálogo, descubre ofertas y encuentra exactamente lo que necesitas.',
+    primaryCta: 'Explorar productos',
+    secondaryCta: 'Consultar pedido',
+    trust: ['Compra protegida', 'Soporte cercano', 'Entrega organizada'],
+    image: '/placeholders/hero.svg',
+  },
+  featured: {
+    overline: 'Selección recomendada',
+    title: 'Productos destacados',
+    subtitle:
+      'Una selección de productos y servicios recomendados por nuestro equipo.',
+  },
+  how: {
+    overline: 'Proceso de compra',
+    title: 'Cómo funciona',
+    subtitle: 'Un proceso claro desde la selección hasta la entrega final.',
+    steps: [
+      {
+        id: 's1',
+        number: '01',
+        icon: 'ri-search-eye-line',
+        title: 'Elige',
+        text: 'Selecciona producto, licencia o servicio.',
+      },
+      {
+        id: 's2',
+        number: '02',
+        icon: 'ri-shopping-cart-2-line',
+        title: 'Compra',
+        text: 'Completa tu pedido desde la tienda.',
+      },
+      {
+        id: 's3',
+        number: '03',
+        icon: 'ri-tools-line',
+        title: 'Personalizamos',
+        text: 'Recibimos tus datos y configuramos tu entrega.',
+      },
+      {
+        id: 's4',
+        number: '04',
+        icon: 'ri-download-cloud-2-line',
+        title: 'Recibe',
+        text: 'Accede a descargas, licencias y soporte desde tu cuenta.',
+      },
+    ],
+  },
+  contact: {
+    overline: 'Contacto y soporte',
+    title: '¿Cómo podemos ayudarte?',
+    subtitle:
+      'Cuéntanos qué necesitas. Crearemos un ticket con número de seguimiento para que recibas cada respuesta y mantengas toda la conversación organizada.',
+    benefits: [
+      {
+        icon: 'ri-ticket-2-line',
+        title: 'Número de seguimiento',
+        text: 'Cada consulta se registra como un ticket real.',
+      },
+      {
+        icon: 'ri-mail-check-line',
+        title: 'Correo validado',
+        text: 'El ticket solo se crea después de confirmar tu dirección.',
+      },
+      {
+        icon: 'ri-history-line',
+        title: 'Conversación organizada',
+        text: 'Consulta el historial completo desde un enlace privado.',
+      },
+    ],
+  },
+  finalCta: {
+    overline: 'Comienza hoy',
+    title: 'Encuentra la solución ideal para tu proyecto',
+    subtitle: 'Explora el catálogo completo y crea tu pedido cuando estés listo.',
+    button: 'Explorar catálogo',
+  },
+  footer: {
+    tagline: 'Custom IPTV applications for brands and businesses.',
+    companyLinks: [
+      { label: 'Inicio', href: '/' },
+      { label: 'Tienda', href: '/#featured' },
+    ],
+    supportLinks: [
+      { label: 'Soporte', href: '/#contact-support' },
+      { label: 'WhatsApp', href: '#' },
+      { label: 'Admin', href: '/admin' },
+    ],
+    ctaTitle: '¿Listo para comenzar?',
+    ctaText: 'Explora nuestros productos y servicios digitales.',
+    ctaButton: 'Ver catálogo',
+    copyright: '© 2026 AppRebrands. v1.0.15',
+  },
+  stats: [
+    {
+      id: 'st1',
+      icon: 'ri-rocket-2-line',
+      value: '250+',
+      label: 'Aplicaciones entregadas',
+    },
+    {
+      id: 'st2',
+      icon: 'ri-group-line',
+      value: '80+',
+      label: 'Clientes activos',
+    },
+    {
+      id: 'st3',
+      icon: 'ri-checkbox-circle-line',
+      value: '99.9%',
+      label: 'Disponibilidad',
+    },
+    {
+      id: 'st4',
+      icon: 'ri-customer-service-2-line',
+      value: '24/7',
+      label: 'Soporte especializado',
+    },
+    {
+      id: 'st5',
+      icon: 'ri-palette-line',
+      value: '100%',
+      label: 'Personalización total',
+    },
+  ],
+  products: [
+    {
+      id: 'p1',
+      name: 'Nova IPTV Player | Aplicación Flutter con panel de administración PHP',
+      price: 79.99,
+      description:
+        'Reproductor IPTV multiplataforma con panel de administración PHP incluido.',
+      category: 'Android',
+      typeLabel: 'Producto digital',
+      featured: true,
+      image: '/placeholders/product-1.svg',
+    },
+    {
+      id: 'p2',
+      name: 'XOE PLUS Roku',
+      price: 425.0,
+      description: 'Aplicación Roku personalizada con branding completo.',
+      category: 'Roku',
+      typeLabel: 'Personalizado',
+      featured: true,
+      image: '/placeholders/product-2.svg',
+    },
+    {
+      id: 'p3',
+      name: 'XCTV Trailer API Pro',
+      price: 149.0,
+      description: 'API profesional para trailers y metadata de contenido.',
+      category: 'Scripts',
+      typeLabel: 'Personalizado',
+      featured: true,
+      image: '/placeholders/product-3.svg',
+    },
+    {
+      id: 'p4',
+      name: 'Servidor de Correo Profesional',
+      price: 45.0,
+      description: 'Servidor de correo listo para producción con soporte incluido.',
+      category: 'Paquetes',
+      typeLabel: 'Producto digital',
+      featured: true,
+      image: '/placeholders/product-4.svg',
+    },
+  ],
+  categories: ['Android', 'Roku', 'Paquetes', 'Scripts'],
+  whatsapp: {
+    phone: '15551234567',
+    productMessageTemplate:
+      'Hola, me interesa *{name}* ({price}). ¿Me pueden ayudar con la compra?',
+    cartMessageTemplate:
+      'Hola, quiero continuar mi pedido por WhatsApp:\n{items}\nTotal estimado: {total}',
+    generalMessageTemplate:
+      'Hola, quiero más información sobre sus productos y servicios.',
+  },
+  admin: {
+    password: DEFAULT_ADMIN_PASSWORD,
+  },
+}

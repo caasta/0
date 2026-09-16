@@ -1,45 +1,23 @@
-const STEPS = [
-  {
-    n: '01',
-    icon: 'ri-search-eye-line',
-    title: 'Elige',
-    text: 'Selecciona producto, licencia o servicio.',
-  },
-  {
-    n: '02',
-    icon: 'ri-shopping-cart-2-line',
-    title: 'Compra',
-    text: 'Completa tu pedido desde la tienda.',
-  },
-  {
-    n: '03',
-    icon: 'ri-tools-line',
-    title: 'Personalizamos',
-    text: 'Recibimos tus datos y configuramos tu entrega.',
-  },
-  {
-    n: '04',
-    icon: 'ri-download-cloud-2-line',
-    title: 'Recibe',
-    text: 'Accede a descargas, licencias y soporte desde tu cuenta.',
-  },
-]
+import { useStore } from '../context/StoreContext'
 
 export default function HowItWorks() {
+  const { content } = useStore()
+  const { how } = content
+
   return (
     <section className="commerce-section commerce-how">
       <div className="store-container">
         <header className="commerce-section-head">
           <div>
-            <span>Proceso de compra</span>
-            <h2>Cómo funciona</h2>
-            <p>Un proceso claro desde la selección hasta la entrega final.</p>
+            <span>{how.overline}</span>
+            <h2>{how.title}</h2>
+            <p>{how.subtitle}</p>
           </div>
         </header>
         <div className="commerce-how-grid">
-          {STEPS.map((step) => (
-            <article key={step.n}>
-              <b>{step.n}</b>
+          {how.steps.map((step) => (
+            <article key={step.id}>
+              <b>{step.number}</b>
               <i className={step.icon} />
               <h3>{step.title}</h3>
               <p>{step.text}</p>

@@ -1,12 +1,17 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { useStore } from '../context/StoreContext'
+import { generalWhatsAppUrl, openWhatsApp } from '../lib/whatsapp'
 
 export default function ContactSupport() {
+  const { content } = useStore()
+  const { contact } = content
   const [submitted, setSubmitted] = useState(false)
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault()
     setSubmitted(true)
+    openWhatsApp(generalWhatsAppUrl(content))
   }
 
   return (
@@ -15,47 +20,26 @@ export default function ContactSupport() {
         <div className="support-contact-copy">
           <span className="support-contact-kicker">
             <i className="ri-customer-service-2-line" />
-            Contacto y soporte
+            {contact.overline}
           </span>
-          <h1>¿Cómo podemos ayudarte?</h1>
-          <p>
-            Cuéntanos qué necesitas. Crearemos un ticket con número de seguimiento
-            para que recibas cada respuesta y mantengas toda la conversación
-            organizada.
-          </p>
+          <h1>{contact.title}</h1>
+          <p>{contact.subtitle}</p>
           <div className="support-contact-benefits">
-            <article>
-              <i className="ri-ticket-2-line" />
-              <span>
-                <strong>Número de seguimiento</strong>
-                <small>Cada consulta se registra como un ticket real.</small>
-              </span>
-            </article>
-            <article>
-              <i className="ri-mail-check-line" />
-              <span>
-                <strong>Correo validado</strong>
-                <small>
-                  El ticket solo se crea después de confirmar tu dirección.
-                </small>
-              </span>
-            </article>
-            <article>
-              <i className="ri-history-line" />
-              <span>
-                <strong>Conversación organizada</strong>
-                <small>
-                  Consulta el historial completo desde un enlace privado.
-                </small>
-              </span>
-            </article>
+            {contact.benefits.map((b) => (
+              <article key={b.title}>
+                <i className={b.icon} />
+                <span>
+                  <strong>{b.title}</strong>
+                  <small>{b.text}</small>
+                </span>
+              </article>
+            ))}
           </div>
         </div>
         <form className="support-contact-form" onSubmit={onSubmit}>
           {submitted && (
             <div className="support-form-alert success" role="status">
-              Demo: formulario listo. En el sitio real se valida el correo y se
-              crea un ticket.
+              Abriendo WhatsApp para continuar la conversación…
             </div>
           )}
           <label>
@@ -114,31 +98,13 @@ export default function ContactSupport() {
               required
             />
           </label>
-          <div className="internal-captcha-widget">
-            <img
-              src="/placeholders/captcha.svg"
-              alt="Imagen de verificación"
-            />
-            <button type="button" aria-label="Actualizar captcha">
-              <i className="ri-refresh-line" />
-            </button>
-            <input
-              type="text"
-              name="captcha"
-              maxLength={6}
-              autoComplete="off"
-              placeholder="Escribe el código de la imagen"
-              required
-            />
-          </div>
           <button type="submit">
-            <i className="ri-send-plane-fill" />
-            Validar correo y continuar
+            <i className="ri-whatsapp-fill" />
+            Continuar por WhatsApp
           </button>
           <p className="support-contact-privacy">
             <i className="ri-shield-check-line" />
-            Usaremos estos datos únicamente para responder tu solicitud.{' '}
-            <a href="#">Política de privacidad</a>
+            Te redirigiremos a WhatsApp con el número configurado en el admin.
           </p>
         </form>
       </div>

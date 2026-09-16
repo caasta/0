@@ -1,4 +1,16 @@
+import { useStore } from '../context/StoreContext'
+import { generalWhatsAppUrl, openWhatsApp } from '../lib/whatsapp'
+
+const TRUST_ICONS = [
+  'ri-shield-check-line',
+  'ri-customer-service-2-line',
+  'ri-download-cloud-2-line',
+]
+
 export default function Hero() {
+  const { content } = useStore()
+  const { hero } = content
+
   return (
     <section className="commerce-hero has-image">
       <div className="commerce-hero-glow" />
@@ -6,43 +18,35 @@ export default function Hero() {
         <div className="commerce-hero-copy">
           <span className="commerce-kicker">
             <i className="ri-sparkling-2-line" />
-            Comercio Electrónico
+            {hero.kicker}
           </span>
-          <h1>Encuentra productos creados para tu negocio.</h1>
-          <p>
-            Explora nuestro catálogo, descubre ofertas y encuentra exactamente lo
-            que necesitas.
-          </p>
+          <h1>{hero.title}</h1>
+          <p>{hero.subtitle}</p>
           <div className="commerce-hero-actions">
             <a className="store-btn primary" href="#featured">
-              Explorar productos
+              {hero.primaryCta}
               <i className="ri-arrow-right-line" />
             </a>
-            <a className="store-btn secondary" href="#contact-support">
-              <i className="ri-search-eye-line" />
-              Consultar pedido
-            </a>
+            <button
+              type="button"
+              className="store-btn secondary"
+              onClick={() => openWhatsApp(generalWhatsAppUrl(content))}
+            >
+              <i className="ri-whatsapp-line" />
+              {hero.secondaryCta}
+            </button>
           </div>
           <div className="commerce-trust">
-            <span>
-              <i className="ri-shield-check-line" />
-              Compra protegida
-            </span>
-            <span>
-              <i className="ri-customer-service-2-line" />
-              Soporte cercano
-            </span>
-            <span>
-              <i className="ri-download-cloud-2-line" />
-              Entrega organizada
-            </span>
+            {hero.trust.map((label, i) => (
+              <span key={label}>
+                <i className={TRUST_ICONS[i] || 'ri-checkbox-circle-line'} />
+                {label}
+              </span>
+            ))}
           </div>
         </div>
         <div className="commerce-hero-media">
-          <img
-            src="/placeholders/hero.svg"
-            alt="Encuentra productos creados para tu negocio."
-          />
+          <img src={hero.image} alt={hero.title} />
         </div>
       </div>
     </section>

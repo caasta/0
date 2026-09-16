@@ -1,21 +1,25 @@
-type Props = {
-  theme: 'dark' | 'light'
-  onToggleTheme: () => void
-}
+import { Link } from 'react-router-dom'
+import { useStore } from '../context/StoreContext'
+import {
+  generalWhatsAppUrl,
+  openWhatsApp,
+} from '../lib/whatsapp'
 
-export default function Header({ theme, onToggleTheme }: Props) {
+export default function Header() {
+  const { content, theme, toggleTheme, cartCount } = useStore()
+
   return (
     <header className="store-header">
       <div className="store-container store-nav">
-        <a className="store-brand" href="#">
-          <img src="/placeholders/logo.svg" alt="" />
-          <strong>AppRebrands</strong>
-        </a>
+        <Link className="store-brand" to="/">
+          <img src={content.logoUrl} alt="" />
+          <strong>{content.brandName}</strong>
+        </Link>
         <nav>
-          <a href="#">
+          <Link to="/">
             <i className="ri-home-4-fill" />
             Inicio
-          </a>
+          </Link>
           <details className="store-catalog-menu">
             <summary>
               <i className="ri-store-2-fill" />
@@ -23,26 +27,16 @@ export default function Header({ theme, onToggleTheme }: Props) {
               <i className="ri-arrow-down-s-line" />
             </summary>
             <div>
-              <a href="#featured">
+              <a href="/#catalog">
                 <i className="ri-layout-grid-fill" />
                 Todos los productos
               </a>
-              <a href="#featured">
-                <i className="ri-folder-3-line" />
-                Android
-              </a>
-              <a href="#featured">
-                <i className="ri-folder-3-line" />
-                Roku
-              </a>
-              <a href="#featured">
-                <i className="ri-folder-3-line" />
-                Paquetes
-              </a>
-              <a href="#featured">
-                <i className="ri-folder-3-line" />
-                Scripts
-              </a>
+              {content.categories.map((cat) => (
+                <a key={cat} href={`/#catalog`}>
+                  <i className="ri-folder-3-line" />
+                  {cat}
+                </a>
+              ))}
             </div>
           </details>
         </nav>
@@ -62,17 +56,22 @@ export default function Header({ theme, onToggleTheme }: Props) {
             className="store-icon"
             type="button"
             aria-label="Cambiar tema"
-            onClick={onToggleTheme}
+            onClick={toggleTheme}
           >
             <i className={theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line'} />
           </button>
-          <a className="store-cart-link" href="#featured" aria-label="Carrito">
+          <Link className="store-cart-link" to="/cart" aria-label="Lista">
             <i className="ri-shopping-cart-2-line" />
-          </a>
-          <a className="store-login-button" href="#contact-support">
-            <i className="ri-login-box-line" />
-            <span>Ingresar</span>
-          </a>
+            {cartCount > 0 && <b className="cart-badge">{cartCount}</b>}
+          </Link>
+          <button
+            type="button"
+            className="store-login-button"
+            onClick={() => openWhatsApp(generalWhatsAppUrl(content))}
+          >
+            <i className="ri-whatsapp-line" />
+            <span>WhatsApp</span>
+          </button>
         </div>
       </div>
     </header>

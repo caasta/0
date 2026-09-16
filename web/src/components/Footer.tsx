@@ -1,45 +1,74 @@
+import { Link } from 'react-router-dom'
+import { useStore } from '../context/StoreContext'
+import { generalWhatsAppUrl, openWhatsApp } from '../lib/whatsapp'
+
 export default function Footer() {
+  const { content } = useStore()
+  const { footer } = content
+
   return (
     <footer className="store-footer">
       <div className="store-container store-footer-grid">
         <section className="store-footer-brand">
-          <a className="store-brand" href="#">
-            <img src="/placeholders/logo.svg" alt="" />
-            <strong>AppRebrands</strong>
-          </a>
-          <p>Custom IPTV applications for brands and businesses.</p>
-          <nav className="store-social-links" aria-label="Redes sociales" />
+          <Link className="store-brand" to="/">
+            <img src={content.logoUrl} alt="" />
+            <strong>{content.brandName}</strong>
+          </Link>
+          <p>{footer.tagline}</p>
+          <nav className="store-social-links" aria-label="Redes sociales">
+            <button
+              type="button"
+              aria-label="WhatsApp"
+              onClick={() => openWhatsApp(generalWhatsAppUrl(content))}
+            >
+              <i className="ri-whatsapp-line" />
+            </button>
+          </nav>
         </section>
         <section>
           <h3>Empresa</h3>
           <nav>
-            <a href="#">Inicio</a>
-            <a href="#featured">Tienda</a>
+            {footer.companyLinks.map((l) => (
+              <Link key={l.label} to={l.href}>
+                {l.label}
+              </Link>
+            ))}
           </nav>
         </section>
         <section>
           <h3>Soporte</h3>
           <nav>
-            <a href="#contact-support">Soporte</a>
-            <a href="#contact-support">Mi cuenta</a>
-            <a href="#contact-support">Descargas</a>
+            {footer.supportLinks.map((l) =>
+              l.href === '#' ? (
+                <button
+                  key={l.label}
+                  type="button"
+                  className="footer-text-btn"
+                  onClick={() => openWhatsApp(generalWhatsAppUrl(content))}
+                >
+                  {l.label}
+                </button>
+              ) : (
+                <Link key={l.label} to={l.href}>
+                  {l.label}
+                </Link>
+              ),
+            )}
           </nav>
         </section>
         <section className="store-footer-cta">
-          <h3>¿Listo para comenzar?</h3>
-          <p>Explora nuestros productos y servicios digitales.</p>
-          <a className="store-btn primary" href="#featured">
-            Ver catálogo
+          <h3>{footer.ctaTitle}</h3>
+          <p>{footer.ctaText}</p>
+          <a className="store-btn primary" href="#catalog">
+            {footer.ctaButton}
             <i className="ri-arrow-right-line" />
           </a>
         </section>
         <div className="store-footer-bottom">
-          <small>
-            © 2026 AppRebrands. <strong>v1.0.15</strong>
-          </small>
+          <small>{footer.copyright}</small>
           <nav className="store-legal-links">
-            <a href="#">Política de privacidad</a>
-            <a href="#">Términos y condiciones</a>
+            <Link to="/admin">Admin</Link>
+            <a href="#contact-support">Soporte</a>
           </nav>
         </div>
       </div>
