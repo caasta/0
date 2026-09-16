@@ -64,6 +64,11 @@ export default function AdminPage() {
     setDraft(content)
   }, [content])
 
+  const editingProduct = useMemo(
+    () => draft.products.find((p) => p.id === editingId) ?? null,
+    [draft.products, editingId],
+  )
+
   if (!adminAuthed) return <Navigate to="/admin/login" replace />
 
   const syncDraft = (next: SiteContent) => setDraft(next)
@@ -73,11 +78,6 @@ export default function AdminPage() {
     setSavedAt(new Date().toLocaleTimeString())
     setNotice('Cambios guardados en este navegador (localStorage).')
   }
-
-  const editingProduct = useMemo(
-    () => draft.products.find((p) => p.id === editingId) ?? null,
-    [draft.products, editingId],
-  )
 
   const upsertProduct = (product: Product) => {
     const exists = draft.products.some((p) => p.id === product.id)
