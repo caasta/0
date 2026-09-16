@@ -57,30 +57,27 @@ npm start
 Abre: `http://localhost:3000`  
 Admin: `http://localhost:3000/admin` → `admin` / tu contraseña.
 
-## Empaquetar ZIP para subir
+## Descargar el ZIP (sin GitHub)
+
+El paquete listo para subir está en el **Project Context → media**:
+
+- Ruta estable: `media/apprebrands-deploy.zip`
+- Copia con fecha: `media/apprebrands-deploy-YYYYMMDD.zip`
+
+Descárgalo a tu PC, súbelo al hosting (o descomprime localmente) y continúa:
 
 ```bash
-npm run pack
-```
-
-Se crea un archivo en `deploy/apprebrands-deploy-YYYYMMDD.zip` con:
-
-- `dist/` (frontend)
-- `server/` (API)
-- `package.json` + `package-lock.json`
-- `data/.gitkeep`
-- `.env.example` y `README.md`
-
-### En el servidor
-
-```bash
-unzip apprebrands-deploy-YYYYMMDD.zip -d apprebrands
+unzip apprebrands-deploy.zip -d apprebrands
 cd apprebrands
 npm install --omit=dev
 cp .env.example .env
 # Edita .env: ADMIN_PASSWORD, PORT
 npm start
 ```
+
+No hace falta clonar ningún repositorio.
+
+El ZIP incluye: `dist/`, `server/`, `package.json` + lock, `data/.gitkeep`, `.env.example`, `README.md`.
 
 Para dejarlo en segundo plano puedes usar `pm2`, `systemd` o el gestor Node del hosting.
 
@@ -103,13 +100,64 @@ DigitalOcean, Linode, AWS Lightsail, etc.:
 
 ### 3) cPanel / “Node.js App” / Passenger
 
-1. Crea una aplicación Node apuntando a la carpeta del proyecto.
-2. Startup file: `server/index.js`
-3. Ejecuta build una vez (`npm run build`) o sube el ZIP ya construido.
-4. Asegura que `data/` sea escribible.
-5. Variables: `PORT` (el que asigne cPanel), `ADMIN_PASSWORD`, `NODE_ENV=production`.
+Campos típicos en cPanel → **Setup Node.js App**:
+
+| Campo | Valor |
+|---|---|
+| Node.js version | **20** |
+| Application root | `/home/iptvzlax/web.paneles.xyz` (la carpeta donde descomprimiste el ZIP) |
+| Application URL | `web.paneles.xyz` |
+| Application startup file | **`app.js`** (alternativa: `server/index.js`) |
+| Application mode | Production |
+
+Variables de entorno en el panel:
+
+- `NODE_ENV=production`
+- `HOST=0.0.0.0`
+- `ADMIN_PASSWORD=TuClaveSegura` (solo aplica si aún no existe `data/auth.json`)
+- `PORT` lo asigna cPanel (no lo fuerces salvo que el panel lo pida)
+
+Después de subir el ZIP, en la terminal del hosting:
+
+```bash
+source /home/iptvzlax/nodevenv/web.paneles.xyz/20/bin/activate && cd /home/iptvzlax/web.paneles.xyz
+npm install --omit=dev
+```
+
+Luego **Restart** de la app en cPanel. Prueba:
+
+- https://web.paneles.xyz/
+- https://web.paneles.xyz/api/health  → debe devolver JSON `{"ok":true,...}`
+- https://web.paneles.xyz/admin
+
+Asegura que la carpeta `data/` sea escribible (`chmod 755 data` o el dueño correcto).
 
 **No sirve** hosting “solo estático” (Netlify/GitHub Pages sin backend) si quieres que el admin guarde para todos.
+
+### Error cPanel: content-type `text/html` vs `text/html; charset=utf-8`
+
+Mensaje típico tras “Run NPM Install”:
+
+> An error occured during installation of modules... Web application responds, but its return code "None" or content type before operation "text/html" doesn't equal to content type after operation "text/html; charset=utf-8".
+
+Esto es un **falso positivo conocido** del comprobador de cPanel: compara cabeceras HTML antes/después del install y a veces falla aunque la app esté bien.
+
+Qué hacer:
+
+1. En terminal (con el venv de Node 20):
+
+```bash
+source /home/iptvzlax/nodevenv/web.paneles.xyz/20/bin/activate && cd /home/iptvzlax/web.paneles.xyz
+npm install --omit=dev
+```
+
+2. En cPanel → Node.js App: **Restart**.
+3. Abre https://web.paneles.xyz/ y https://web.paneles.xyz/api/health
+4. Si la tienda carga y `/api/health` responde JSON, **puedes ignorar** ese aviso del instalador.
+5. Startup file preferido: `app.js` (también vale `server/index.js`).
+6. Si la página no abre: revisa logs de la app Node, que exista `dist/`, y que `data/` sea escribible.
+
+El paquete actual fuerza `Content-Type: text/html; charset=utf-8` en el SPA y JSON con charset para reducir este falso positivo.
 
 ## Desarrollo local (con recarga)
 

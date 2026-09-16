@@ -29,6 +29,7 @@ function copy(src, dest) {
 
 copy(path.join(root, 'dist'), path.join(staging, 'dist'))
 copy(path.join(root, 'server'), path.join(staging, 'server'))
+copy(path.join(root, 'app.js'), path.join(staging, 'app.js'))
 fs.mkdirSync(path.join(staging, 'data'), { recursive: true })
 fs.writeFileSync(path.join(staging, 'data', '.gitkeep'), '')
 copy(path.join(root, 'package.json'), path.join(staging, 'package.json'))
@@ -39,11 +40,18 @@ if (fs.existsSync(path.join(root, '.env.example'))) {
 if (fs.existsSync(path.join(root, 'README.md'))) {
   copy(path.join(root, 'README.md'), path.join(staging, 'README.md'))
 }
+if (fs.existsSync(path.join(root, 'docs', 'guia-produccion.md'))) {
+  fs.mkdirSync(path.join(staging, 'docs'), { recursive: true })
+  copy(
+    path.join(root, 'docs', 'guia-produccion.md'),
+    path.join(staging, 'docs', 'guia-produccion.md'),
+  )
+}
 
 // Production package.json: ensure start script works; omit vite from required runtime
 const pkg = JSON.parse(fs.readFileSync(path.join(staging, 'package.json'), 'utf8'))
 pkg.scripts = {
-  start: 'NODE_ENV=production node server/index.js',
+  start: 'NODE_ENV=production node app.js',
 }
 delete pkg.devDependencies
 fs.writeFileSync(path.join(staging, 'package.json'), JSON.stringify(pkg, null, 2))
